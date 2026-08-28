@@ -1,6 +1,6 @@
 {
   "name": "nova",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Object-oriented HTTP framework for TypeScript, with controllers, decorators, DTOs and multi-runtime support.",
   "type": "module",
   "private": true,

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and design discussions
+    url: https://github.com/Rodrigoclc/Nova/discussions
+    about: Use Discussions for questions, API design, architecture, naming, and other open-ended topics.
