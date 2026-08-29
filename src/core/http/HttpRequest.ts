@@ -1,13 +1,13 @@
-export type HttpMethod =
-  "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
+import type { HttpHeaders } from "./HttpHeaders.js";
+
+export type HttpQueryValue = string | readonly string[];
+
+export type HttpQuery = Readonly<Record<string, HttpQueryValue>>;
 
 export interface HttpRequest {
-  readonly method: HttpMethod;
+  readonly method: string;
   readonly path: string;
-
-  readonly headers: Readonly<Record<string, string>>;
-  readonly query: Readonly<Record<string, string>>;
-  readonly params: Readonly<Record<string, string>>;
-
-  readonly body?: unknown;
+  readonly headers: HttpHeaders;
+  readonly query: HttpQuery;
+  readonly body?: Uint8Array;
 }
