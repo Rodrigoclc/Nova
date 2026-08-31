@@ -7,8 +7,5 @@ export type HttpHandler = (
 ) => HttpResponse | Promise<HttpResponse>;
 
 export interface HttpAdapter {
-  listen(
-    port: number,
-    handler: HttpHandler,
-  ): HttpServer | Promise<HttpServer>;
+  listen(port: number, handler: HttpHandler): HttpServer | Promise<HttpServer>;
 }
