@@ -32,6 +32,8 @@
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
     "typecheck:node": "tsc -p tsconfig.node.json --noEmit",
     "typecheck:bun": "tsc -p tsconfig.bun.json --noEmit",
+    "test": "npm run build && npm run test:node",
+    "test:node": "node --test tests/node/*.test.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
