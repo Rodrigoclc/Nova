@@ -38,3 +38,5 @@ jobs:
           git add package-lock.json
           git commit -m "chore: update package lock [skip ci]"
           git push
+
+# Temporary workflow: remove before opening the pull request.
