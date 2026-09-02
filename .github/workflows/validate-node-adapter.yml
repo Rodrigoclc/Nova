@@ -33,3 +33,5 @@ jobs:
 
       - name: Check formatting
         run: npm run format:check
+
+# Temporary validation workflow: remove before opening the pull request.
