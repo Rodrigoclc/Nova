@@ -78,10 +78,7 @@ test("NodeHttpAdapter translates Node HTTP traffic to Nova contracts", async () 
       page: "2",
     });
     assert.equal(capturedRequest.headers["x-nova-test"], "adapter");
-    assert.deepEqual(
-      Array.from(capturedRequest.body ?? []),
-      [1, 2, 3, 4],
-    );
+    assert.deepEqual(Array.from(capturedRequest.body ?? []), [1, 2, 3, 4]);
   } finally {
     await server.close();
   }
