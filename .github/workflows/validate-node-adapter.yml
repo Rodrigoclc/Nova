@@ -31,6 +31,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Test Node.js adapter
+        run: npm run test:node
+
       - name: Check formatting
         run: npm run format:check
 
