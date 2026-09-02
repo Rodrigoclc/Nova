@@ -3,7 +3,8 @@ import { Buffer } from "node:buffer";
 import { createServer } from "node:net";
 import test from "node:test";
 
-import { NodeHttpAdapter } from "../../dist/adapters/node/index.js";
+import { Application } from "nova";
+import { NodeHttpAdapter } from "nova/node";
 
 async function getAvailablePort() {
   const server = createServer();
@@ -34,12 +35,12 @@ async function getAvailablePort() {
   return address.port;
 }
 
-test("NodeHttpAdapter translates Node HTTP traffic to Nova contracts", async () => {
+test("Nova handles HTTP traffic through the Node.js adapter", async () => {
   const port = await getAvailablePort();
-  const adapter = new NodeHttpAdapter();
+  const app = new Application(new NodeHttpAdapter());
   let capturedRequest;
 
-  const server = await adapter.listen(port, (request) => {
+  const server = await app.listen(port, (request) => {
     capturedRequest = request;
 
     return {
