@@ -117,7 +117,9 @@ export class NodeHttpAdapter implements HttpAdapter {
     return query;
   }
 
-  private async readBody(request: IncomingMessage): Promise<Uint8Array | undefined> {
+  private async readBody(
+    request: IncomingMessage,
+  ): Promise<Uint8Array | undefined> {
     const chunks: Buffer[] = [];
 
     for await (const chunk of request) {
@@ -131,7 +133,10 @@ export class NodeHttpAdapter implements HttpAdapter {
     return Buffer.concat(chunks);
   }
 
-  private writeResponse(response: ServerResponse, httpResponse: HttpResponse): void {
+  private writeResponse(
+    response: ServerResponse,
+    httpResponse: HttpResponse,
+  ): void {
     response.statusCode = httpResponse.statusCode;
 
     if (httpResponse.headers) {
