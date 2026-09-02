@@ -24,8 +24,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "npm run build:core && npm run build:node && npm run build:bun",
+    "build:core": "tsc -p tsconfig.json",
+    "build:node": "tsc -p tsconfig.node.json",
+    "build:bun": "tsc -p tsconfig.bun.json",
+    "typecheck": "npm run typecheck:core && npm run typecheck:node && npm run typecheck:bun",
+    "typecheck:core": "tsc -p tsconfig.json --noEmit",
+    "typecheck:node": "tsc -p tsconfig.node.json --noEmit",
+    "typecheck:bun": "tsc -p tsconfig.bun.json --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
