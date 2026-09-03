@@ -55,10 +55,11 @@ test("Nova handles HTTP traffic through the Node.js adapter", async () => {
 
   try {
     const response = await fetch(
-      `http://127.0.0.1:${port}/users?tag=node&tag=typescript&page=2`,
+      `http://127.0.0.1:${port}/users?tag=node&tag=typescript&page=2&constructor=first&constructor=second&toString=value`,
       {
         method: "POST",
         headers: {
+          constructor: "header-value",
           "content-type": "application/octet-stream",
           "x-nova-test": "adapter",
         },
@@ -77,7 +78,10 @@ test("Nova handles HTTP traffic through the Node.js adapter", async () => {
     assert.deepEqual(capturedRequest.query, {
       tag: ["node", "typescript"],
       page: "2",
+      constructor: ["first", "second"],
+      toString: "value",
     });
+    assert.equal(capturedRequest.headers.constructor, "header-value");
     assert.equal(capturedRequest.headers["x-nova-test"], "adapter");
     assert.deepEqual(Array.from(capturedRequest.body ?? []), [1, 2, 3, 4]);
   } finally {
