@@ -74,7 +74,8 @@ export class NodeHttpAdapter implements HttpAdapter {
   }
 
   private toHttpHeaders(request: IncomingMessage): HttpHeaders {
-    const headers: Record<string, string | readonly string[]> = {};
+    const headers: Record<string, string | readonly string[]> =
+      Object.create(null) as Record<string, string | readonly string[]>;
 
     for (let index = 0; index + 1 < request.rawHeaders.length; index += 2) {
       const rawName = request.rawHeaders[index];
@@ -96,11 +97,13 @@ export class NodeHttpAdapter implements HttpAdapter {
       }
     }
 
-    return headers;
+    return { ...headers };
   }
 
   private toHttpQuery(url: URL): HttpQuery {
-    const query: Record<string, HttpQueryValue> = {};
+    const query: Record<string, HttpQueryValue> = Object.create(
+      null,
+    ) as Record<string, HttpQueryValue>;
 
     for (const [name, value] of url.searchParams) {
       const current = query[name];
@@ -114,7 +117,7 @@ export class NodeHttpAdapter implements HttpAdapter {
       }
     }
 
-    return query;
+    return { ...query };
   }
 
   private async readBody(
