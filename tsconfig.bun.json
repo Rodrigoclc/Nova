@@ -3,11 +3,6 @@
   "compilerOptions": {
     "types": []
   },
-  "include": [
-    "src/index.ts",
-    "src/core/**/*.ts",
-    "src/routing/**/*.ts",
-    "src/decorators/**/*.ts"
-  ],
+  "include": ["src/adapters/bun/**/*.ts"],
   "exclude": ["dist", "node_modules"]
 }
