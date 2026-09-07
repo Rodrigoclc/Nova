@@ -1,7 +1,9 @@
 import type { HttpHeaders } from "./HttpHeaders.js";
 
-export interface HttpResponse<T = unknown> {
+export type HttpResponseBody = string | Uint8Array;
+
+export interface HttpResponse {
   readonly statusCode: number;
   readonly headers?: HttpHeaders;
-  readonly body?: T;
+  readonly body?: HttpResponseBody;
 }
