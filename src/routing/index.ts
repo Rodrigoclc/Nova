@@ -1,4 +1,4 @@
-export * from "./HttpMethod.js";
-export * from "./Route.js";
-export * from "./RouteMatcher.js";
-export * from "./Router.js";
+export { HTTP_METHODS, type HttpMethod } from "./HttpMethod.js";
+export type { RouteDefinition, RouteMatch, RouteParams } from "./Route.js";
+export { matchPath } from "./RouteMatcher.js";
+export { Router } from "./Router.js";
