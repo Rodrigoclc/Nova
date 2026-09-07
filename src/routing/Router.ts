@@ -1,4 +1,8 @@
-import type { HttpHandler, HttpRequest, HttpResponse } from "../core/http/index.js";
+import type {
+  HttpHandler,
+  HttpRequest,
+  HttpResponse,
+} from "../core/http/index.js";
 import { toHttpMethod, type HttpMethod } from "./HttpMethod.js";
 import type { RouteDefinition, RouteMatch } from "./Route.js";
 import {
@@ -136,7 +140,10 @@ export class Router {
         continue;
       }
 
-      if (!bestMatch || isMoreSpecific(route.pattern, bestMatch.route.pattern)) {
+      if (
+        !bestMatch ||
+        isMoreSpecific(route.pattern, bestMatch.route.pattern)
+      ) {
         bestMatch = {
           route,
           params,
