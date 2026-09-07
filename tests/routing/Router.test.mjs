@@ -109,25 +109,28 @@ test("Application can use a router as its default handler", async () => {
   await server.close();
 });
 
-test("Application keeps supporting a handler passed directly to listen", async () => {
-  let capturedHandler;
+test(
+  "Application keeps supporting a handler passed directly to listen",
+  async () => {
+    let capturedHandler;
 
-  const adapter = {
-    listen(_port, handler) {
-      capturedHandler = handler;
+    const adapter = {
+      listen(_port, handler) {
+        capturedHandler = handler;
 
-      return {
-        async close() {},
-      };
-    },
-  };
+        return {
+          async close() {},
+        };
+      },
+    };
 
-  const app = new Application(adapter);
-  await app.listen(3000, () => ({
-    statusCode: 204,
-  }));
+    const app = new Application(adapter);
+    await app.listen(3000, () => ({
+      statusCode: 204,
+    }));
 
-  assert.ok(capturedHandler);
-  const response = await capturedHandler(createRequest("GET", "/anything"));
-  assert.equal(response.statusCode, 204);
-});
+    assert.ok(capturedHandler);
+    const response = await capturedHandler(createRequest("GET", "/anything"));
+    assert.equal(response.statusCode, 204);
+  },
+);
