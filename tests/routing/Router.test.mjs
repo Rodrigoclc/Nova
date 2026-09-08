@@ -23,6 +23,8 @@ test("matchPath matches static and parameterized route segments", () => {
     matchPath("/accounts/{id}/statement", "/accounts/123/transfers"),
     undefined,
   );
+  assert.equal(matchPath("/users/{id}", "/users/"), undefined);
+  assert.equal(matchPath("/a/{id}/b", "/a//b"), undefined);
 });
 
 test("Router dispatches by HTTP method and prefers static routes", async () => {
@@ -42,6 +44,7 @@ test("Router dispatches by HTTP method and prefers static routes", async () => {
   }));
 
   assert.deepEqual(router.match("GET", "/users/42")?.params, { id: "42" });
+  assert.equal(router.match("GET", "/users/"), undefined);
 
   const staticResponse = await router.handle(createRequest("GET", "/users/me"));
   assert.equal(staticResponse.statusCode, 200);
