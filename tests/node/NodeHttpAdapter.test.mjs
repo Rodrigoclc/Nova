@@ -3,7 +3,7 @@ import { Buffer } from "node:buffer";
 import { createServer } from "node:net";
 import test from "node:test";
 
-import { Application } from "nova";
+import { Application, Router } from "nova";
 import { NodeHttpAdapter } from "nova/node";
 
 async function getAvailablePort() {
@@ -35,12 +35,12 @@ async function getAvailablePort() {
   return address.port;
 }
 
-test("Nova handles HTTP traffic through the Node.js adapter", async () => {
+test("Nova routes HTTP traffic through the Node.js adapter", async () => {
   const port = await getAvailablePort();
-  const app = new Application(new NodeHttpAdapter());
+  const router = new Router();
   let capturedRequest;
 
-  const server = await app.listen(port, (request) => {
+  router.post("/users", (request) => {
     capturedRequest = request;
 
     return {
@@ -52,6 +52,9 @@ test("Nova handles HTTP traffic through the Node.js adapter", async () => {
       body: "created",
     };
   });
+
+  const app = new Application(new NodeHttpAdapter(), router.handle);
+  const server = await app.listen(port);
 
   try {
     const response = await fetch(
