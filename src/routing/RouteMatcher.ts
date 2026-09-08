@@ -112,6 +112,10 @@ export function matchCompiledRoute(
       continue;
     }
 
+    if (pathSegment.length === 0) {
+      return undefined;
+    }
+
     params[routeSegment.name] = pathSegment;
   }
 
