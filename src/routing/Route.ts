@@ -1,12 +1,15 @@
-import type { HttpHandler } from "../core/http/index.js";
+import type {
+  RequestHandler,
+  RequestParams,
+} from "../core/request/index.js";
 import type { HttpMethod } from "./HttpMethod.js";
 
-export type RouteParams = Readonly<Record<string, string>>;
+export type RouteParams = RequestParams;
 
 export interface RouteDefinition {
   readonly method: HttpMethod;
   readonly path: string;
-  readonly handler: HttpHandler;
+  readonly handler: RequestHandler;
 }
 
 export interface RouteMatch {
