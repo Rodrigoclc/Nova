@@ -42,11 +42,7 @@ function firstHeaderValue(
   return undefined;
 }
 
-function hasHeader(headers: HttpHeaders | undefined, name: string): boolean {
-  if (!headers) {
-    return false;
-  }
-
+function hasHeader(headers: HttpHeaders, name: string): boolean {
   const normalizedName = name.toLowerCase();
   return Object.keys(headers).some(
     (headerName) => headerName.toLowerCase() === normalizedName,
@@ -205,12 +201,19 @@ export class RequestPipeline {
     }
 
     const body = JSON.stringify(response.body);
-    const headers = hasHeader(response.headers, "content-type")
-      ? response.headers
-      : {
-          ...(response.headers ?? {}),
-          "content-type": JSON_CONTENT_TYPE,
-        };
+
+    if (body === undefined) {
+      throw new Error("Response body could not be serialized as JSON.");
+    }
+
+    const headers =
+      response.headers !== undefined &&
+      hasHeader(response.headers, "content-type")
+        ? response.headers
+        : {
+            ...(response.headers ?? {}),
+            "content-type": JSON_CONTENT_TYPE,
+          };
 
     return {
       statusCode: response.statusCode,
