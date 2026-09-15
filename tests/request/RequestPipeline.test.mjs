@@ -27,58 +27,61 @@ function createRequest({
   };
 }
 
-test("Router binds path, query, headers and JSON body into the request context", async () => {
-  const router = new Router();
-  let capturedRequest;
+test(
+  "Router binds path, query, headers and JSON body into the request context",
+  async () => {
+    const router = new Router();
+    let capturedRequest;
 
-  router.post("/users/{id}", (request) => {
-    capturedRequest = request;
+    router.post("/users/{id}", (request) => {
+      capturedRequest = request;
 
-    return {
-      statusCode: 200,
-      body: {
-        id: request.params.id,
-        name: request.body.name,
-        page: request.query.page,
-        trace: request.headers["x-trace"],
-      },
-    };
-  });
+      return {
+        statusCode: 200,
+        body: {
+          id: request.params.id,
+          name: request.body.name,
+          page: request.query.page,
+          trace: request.headers["x-trace"],
+        },
+      };
+    });
 
-  const response = await router.handle(
-    createRequest({
-      method: "POST",
-      path: "/users/42",
-      headers: {
-        "content-type": "application/vnd.nova+json; charset=utf-8",
-        "x-trace": "trace-123",
-      },
-      query: {
-        page: "2",
-        tag: ["node", "typescript"],
-      },
-      body: new TextEncoder().encode('{"name":"Rodrigo"}'),
-    }),
-  );
+    const response = await router.handle(
+      createRequest({
+        method: "POST",
+        path: "/users/42",
+        headers: {
+          "content-type": "application/vnd.nova+json; charset=utf-8",
+          "x-trace": "trace-123",
+        },
+        query: {
+          page: "2",
+          tag: ["node", "typescript"],
+        },
+        body: new TextEncoder().encode('{"name":"Rodrigo"}'),
+      }),
+    );
 
-  assert.ok(capturedRequest);
-  assert.deepEqual(capturedRequest.params, { id: "42" });
-  assert.deepEqual(capturedRequest.body, { name: "Rodrigo" });
-  assert.deepEqual(capturedRequest.query.tag, ["node", "typescript"]);
-  assert.equal(capturedRequest.headers["x-trace"], "trace-123");
+    assert.ok(capturedRequest);
+    assert.deepEqual(capturedRequest.params, { id: "42" });
+    assert.deepEqual(capturedRequest.body, { name: "Rodrigo" });
+    assert.deepEqual(capturedRequest.query.tag, ["node", "typescript"]);
+    assert.equal(capturedRequest.headers["x-trace"], "trace-123");
 
-  assert.equal(response.statusCode, 200);
-  assert.equal(
-    response.headers?.["content-type"],
-    "application/json; charset=utf-8",
-  );
-  assert.deepEqual(JSON.parse(response.body), {
-    id: "42",
-    name: "Rodrigo",
-    page: "2",
-    trace: "trace-123",
-  });
-});
+    assert.equal(response.statusCode, 200);
+    assert.equal(
+      response.headers?.["content-type"],
+      "application/json; charset=utf-8",
+    );
+    assert.deepEqual(JSON.parse(response.body), {
+      id: "42",
+      name: "Rodrigo",
+      page: "2",
+      trace: "trace-123",
+    });
+  },
+);
 
 test("Request pipeline preserves non-JSON bodies as bytes", async () => {
   const router = new Router();
@@ -118,35 +121,38 @@ test("Request pipeline preserves non-JSON bodies as bytes", async () => {
   });
 });
 
-test("Request pipeline rejects malformed JSON before invoking the handler", async () => {
-  const router = new Router();
-  let invoked = false;
+test(
+  "Request pipeline rejects malformed JSON before invoking the handler",
+  async () => {
+    const router = new Router();
+    let invoked = false;
 
-  router.post("/users", () => {
-    invoked = true;
-    return { statusCode: 204 };
-  });
+    router.post("/users", () => {
+      invoked = true;
+      return { statusCode: 204 };
+    });
 
-  const response = await router.handle(
-    createRequest({
-      method: "POST",
-      path: "/users",
-      headers: {
-        "content-type": "application/json",
+    const response = await router.handle(
+      createRequest({
+        method: "POST",
+        path: "/users",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: new TextEncoder().encode('{"name":'),
+      }),
+    );
+
+    assert.equal(invoked, false);
+    assert.equal(response.statusCode, 400);
+    assert.deepEqual(JSON.parse(response.body), {
+      error: {
+        code: "MALFORMED_JSON",
+        message: "Request body contains malformed JSON.",
       },
-      body: new TextEncoder().encode('{"name":'),
-    }),
-  );
-
-  assert.equal(invoked, false);
-  assert.equal(response.statusCode, 400);
-  assert.deepEqual(JSON.parse(response.body), {
-    error: {
-      code: "MALFORMED_JSON",
-      message: "Request body contains malformed JSON.",
-    },
-  });
-});
+    });
+  },
+);
 
 test("Request pipeline enforces the configured body limit", async () => {
   const router = new Router({ maxBodyBytes: 4 });
@@ -175,29 +181,32 @@ test("Request pipeline enforces the configured body limit", async () => {
   });
 });
 
-test("Request pipeline converts unhandled handler failures into a generic 500", async () => {
-  const router = new Router();
+test(
+  "Request pipeline converts unhandled handler failures into a generic 500",
+  async () => {
+    const router = new Router();
 
-  router.get("/failure", () => {
-    throw new Error("database password leaked here");
-  });
+    router.get("/failure", () => {
+      throw new Error("database password leaked here");
+    });
 
-  const response = await router.handle(
-    createRequest({
-      method: "GET",
-      path: "/failure",
-    }),
-  );
+    const response = await router.handle(
+      createRequest({
+        method: "GET",
+        path: "/failure",
+      }),
+    );
 
-  assert.equal(response.statusCode, 500);
-  assert.deepEqual(JSON.parse(response.body), {
-    error: {
-      code: "INTERNAL_SERVER_ERROR",
-      message: "An unexpected error occurred while processing the request.",
-    },
-  });
-  assert.equal(response.body.includes("database password"), false);
-});
+    assert.equal(response.statusCode, 500);
+    assert.deepEqual(JSON.parse(response.body), {
+      error: {
+        code: "INTERNAL_SERVER_ERROR",
+        message: "An unexpected error occurred while processing the request.",
+      },
+    });
+    assert.equal(response.body.includes("database password"), false);
+  },
+);
 
 test("Response serialization preserves an explicit content type", async () => {
   const router = new Router();
@@ -229,5 +238,8 @@ test("Response serialization preserves an explicit content type", async () => {
 
 test("Router rejects invalid request body limits at configuration time", () => {
   assert.throws(() => new Router({ maxBodyBytes: 0 }), /positive safe integer/);
-  assert.throws(() => new Router({ maxBodyBytes: 1.5 }), /positive safe integer/);
+  assert.throws(
+    () => new Router({ maxBodyBytes: 1.5 }),
+    /positive safe integer/,
+  );
 });
