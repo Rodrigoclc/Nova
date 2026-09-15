@@ -56,7 +56,9 @@ function isJsonContentType(contentType: string | undefined): boolean {
 
   const mediaType = contentType.split(";", 1)[0]?.trim().toLowerCase();
 
-  return mediaType === "application/json" || Boolean(mediaType?.endsWith("+json"));
+  return (
+    mediaType === "application/json" || Boolean(mediaType?.endsWith("+json"))
+  );
 }
 
 function errorResponse(
