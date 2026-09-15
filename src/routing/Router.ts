@@ -3,6 +3,11 @@ import type {
   HttpRequest,
   HttpResponse,
 } from "../core/http/index.js";
+import {
+  RequestPipeline,
+  type RequestHandler,
+  type RequestPipelineOptions,
+} from "../core/request/index.js";
 import { toHttpMethod, type HttpMethod } from "./HttpMethod.js";
 import type { RouteDefinition, RouteMatch } from "./Route.js";
 import {
@@ -42,6 +47,11 @@ function isMoreSpecific(
 export class Router {
   private readonly routes: RegisteredRoute[] = [];
   private readonly routeKeys = new Set<string>();
+  private readonly pipeline: RequestPipeline;
+
+  constructor(options: RequestPipelineOptions = {}) {
+    this.pipeline = new RequestPipeline(options);
+  }
 
   readonly handle: HttpHandler = async (
     request: HttpRequest,
@@ -55,10 +65,10 @@ export class Router {
       };
     }
 
-    return match.route.handler(request);
+    return this.pipeline.handle(request, match.params, match.route.handler);
   };
 
-  register(method: HttpMethod, path: string, handler: HttpHandler): this {
+  register(method: HttpMethod, path: string, handler: RequestHandler): this {
     const normalizedMethod = toHttpMethod(method);
 
     if (!normalizedMethod) {
@@ -87,31 +97,31 @@ export class Router {
     return this;
   }
 
-  get(path: string, handler: HttpHandler): this {
+  get(path: string, handler: RequestHandler): this {
     return this.register("GET", path, handler);
   }
 
-  post(path: string, handler: HttpHandler): this {
+  post(path: string, handler: RequestHandler): this {
     return this.register("POST", path, handler);
   }
 
-  put(path: string, handler: HttpHandler): this {
+  put(path: string, handler: RequestHandler): this {
     return this.register("PUT", path, handler);
   }
 
-  patch(path: string, handler: HttpHandler): this {
+  patch(path: string, handler: RequestHandler): this {
     return this.register("PATCH", path, handler);
   }
 
-  delete(path: string, handler: HttpHandler): this {
+  delete(path: string, handler: RequestHandler): this {
     return this.register("DELETE", path, handler);
   }
 
-  head(path: string, handler: HttpHandler): this {
+  head(path: string, handler: RequestHandler): this {
     return this.register("HEAD", path, handler);
   }
 
-  options(path: string, handler: HttpHandler): this {
+  options(path: string, handler: RequestHandler): this {
     return this.register("OPTIONS", path, handler);
   }
 
