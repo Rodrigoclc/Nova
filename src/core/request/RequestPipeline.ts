@@ -159,7 +159,7 @@ export class RequestPipeline {
     }
 
     try {
-      const text = new TextDecoder().decode(request.body);
+      const text = new TextDecoder("utf-8", { fatal: true }).decode(request.body);
       return JSON.parse(text) as unknown;
     } catch {
       throw new RequestPipelineError(
