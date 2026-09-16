@@ -154,6 +154,53 @@ test(
   },
 );
 
+test(
+  "Request pipeline rejects invalid UTF-8 JSON before invoking the handler",
+  async () => {
+    const router = new Router();
+    let invoked = false;
+
+    router.post("/users", () => {
+      invoked = true;
+      return { statusCode: 204 };
+    });
+
+    const response = await router.handle(
+      createRequest({
+        method: "POST",
+        path: "/users",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: new Uint8Array([
+          0x7b,
+          0x22,
+          0x6e,
+          0x61,
+          0x6d,
+          0x65,
+          0x22,
+          0x3a,
+          0x22,
+          0xc3,
+          0x28,
+          0x22,
+          0x7d,
+        ]),
+      }),
+    );
+
+    assert.equal(invoked, false);
+    assert.equal(response.statusCode, 400);
+    assert.deepEqual(JSON.parse(response.body), {
+      error: {
+        code: "MALFORMED_JSON",
+        message: "Request body contains malformed JSON.",
+      },
+    });
+  },
+);
+
 test("Request pipeline enforces the configured body limit", async () => {
   const router = new Router({ maxBodyBytes: 4 });
   let invoked = false;
