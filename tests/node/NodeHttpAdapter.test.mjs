@@ -78,6 +78,7 @@ test("Nova routes HTTP traffic through the Node.js adapter", async () => {
     assert.ok(capturedRequest);
     assert.equal(capturedRequest.method, "POST");
     assert.equal(capturedRequest.path, "/users");
+    assert.deepEqual(capturedRequest.params, {});
     assert.deepEqual(capturedRequest.query, {
       tag: ["node", "typescript"],
       page: "2",
@@ -87,6 +88,46 @@ test("Nova routes HTTP traffic through the Node.js adapter", async () => {
     assert.equal(capturedRequest.headers.constructor, "header-value");
     assert.equal(capturedRequest.headers["x-nova-test"], "adapter");
     assert.deepEqual(Array.from(capturedRequest.body ?? []), [1, 2, 3, 4]);
+  } finally {
+    await server.close();
+  }
+});
+
+test("Nova binds params and JSON through the Node.js adapter", async () => {
+  const port = await getAvailablePort();
+  const router = new Router();
+
+  router.post("/users/{id}", (request) => ({
+    statusCode: 200,
+    body: {
+      id: request.params.id,
+      name: request.body.name,
+    },
+  }));
+
+  const app = new Application(new NodeHttpAdapter(), router.handle);
+  const server = await app.listen(port);
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/users/42`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        name: "Rodrigo",
+      }),
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.headers.get("content-type"),
+      "application/json; charset=utf-8",
+    );
+    assert.deepEqual(await response.json(), {
+      id: "42",
+      name: "Rodrigo",
+    });
   } finally {
     await server.close();
   }

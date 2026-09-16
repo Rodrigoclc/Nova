@@ -3,6 +3,12 @@ import type {
   HttpRequest,
   HttpResponse,
 } from "../core/http/index.js";
+import {
+  RequestPipeline,
+  type RequestContext,
+  type RequestHandler,
+  type RequestPipelineOptions,
+} from "../core/request/index.js";
 import { toHttpMethod, type HttpMethod } from "./HttpMethod.js";
 import type { RouteDefinition, RouteMatch } from "./Route.js";
 import {
@@ -15,6 +21,12 @@ type RegisteredRoute = {
   readonly definition: RouteDefinition;
   readonly pattern: CompiledRoutePattern;
 };
+
+function eraseRequestHandler<TBody, TResponse>(
+  handler: RequestHandler<TBody, TResponse>,
+): RequestHandler {
+  return (request) => handler(request as RequestContext<TBody>);
+}
 
 function isMoreSpecific(
   candidate: CompiledRoutePattern,
@@ -42,6 +54,11 @@ function isMoreSpecific(
 export class Router {
   private readonly routes: RegisteredRoute[] = [];
   private readonly routeKeys = new Set<string>();
+  private readonly pipeline: RequestPipeline;
+
+  constructor(options: RequestPipelineOptions = {}) {
+    this.pipeline = new RequestPipeline(options);
+  }
 
   readonly handle: HttpHandler = async (
     request: HttpRequest,
@@ -55,10 +72,14 @@ export class Router {
       };
     }
 
-    return match.route.handler(request);
+    return this.pipeline.handle(request, match.params, match.route.handler);
   };
 
-  register(method: HttpMethod, path: string, handler: HttpHandler): this {
+  register<TBody = unknown, TResponse = unknown>(
+    method: HttpMethod,
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     const normalizedMethod = toHttpMethod(method);
 
     if (!normalizedMethod) {
@@ -78,7 +99,7 @@ export class Router {
       definition: {
         method: normalizedMethod,
         path,
-        handler,
+        handler: eraseRequestHandler(handler),
       },
       pattern,
     });
@@ -87,31 +108,52 @@ export class Router {
     return this;
   }
 
-  get(path: string, handler: HttpHandler): this {
+  get<TBody = unknown, TResponse = unknown>(
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     return this.register("GET", path, handler);
   }
 
-  post(path: string, handler: HttpHandler): this {
+  post<TBody = unknown, TResponse = unknown>(
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     return this.register("POST", path, handler);
   }
 
-  put(path: string, handler: HttpHandler): this {
+  put<TBody = unknown, TResponse = unknown>(
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     return this.register("PUT", path, handler);
   }
 
-  patch(path: string, handler: HttpHandler): this {
+  patch<TBody = unknown, TResponse = unknown>(
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     return this.register("PATCH", path, handler);
   }
 
-  delete(path: string, handler: HttpHandler): this {
+  delete<TBody = unknown, TResponse = unknown>(
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     return this.register("DELETE", path, handler);
   }
 
-  head(path: string, handler: HttpHandler): this {
+  head<TBody = unknown, TResponse = unknown>(
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     return this.register("HEAD", path, handler);
   }
 
-  options(path: string, handler: HttpHandler): this {
+  options<TBody = unknown, TResponse = unknown>(
+    path: string,
+    handler: RequestHandler<TBody, TResponse>,
+  ): this {
     return this.register("OPTIONS", path, handler);
   }
 
