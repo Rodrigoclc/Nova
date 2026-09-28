@@ -24,7 +24,7 @@ export abstract class Controller {
   }
 
   protected noContent(headers?: HttpHeaders): ApiResponse<never> {
-    return this.response(204, undefined, headers);
+    return this.response<never>(204, undefined, headers);
   }
 
   private response<T>(
