@@ -22,6 +22,10 @@ class UserController extends Controller {
   create(
     request: RequestContext<CreateUserBody>,
   ): ApiResponse<UserResponse> {
+    if (!request.body) {
+      throw new Error("Expected a request body.");
+    }
+
     return this.created({
       id: this.nextId++,
       name: request.body.name,
