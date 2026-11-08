@@ -56,10 +56,10 @@ Serialization
      |
      v
 HTTP adapter
-   /      \
-  /        \
-Node.js     Bun
-node:http   Bun.serve()
+   /     |      \
+  /      |       \
+Node.js  Bun      AWS Lambda
+node:http Bun.serve() Function URL event
 ```
 
 Runtime-specific APIs must remain behind adapters so that controllers and the framework core do not depend on a particular runtime.
@@ -70,6 +70,7 @@ Nova plans to support:
 
 - Node.js 22 and newer
 - Bun through a native Bun adapter
+- AWS Lambda (Function URLs and API Gateway HTTP APIs, payload v2) through `nova/lambda`
 
 Runtime support will be verified by Nova's own test suite as adapters are implemented.
 
@@ -85,7 +86,8 @@ src/
 ├── decorators/
 ├── adapters/
 │   ├── node/
-│   └── bun/
+│   ├── bun/
+│   └── lambda/
 └── index.ts
 ```
 
@@ -115,6 +117,33 @@ Build declarations and JavaScript output:
 ```bash
 npm run build
 ```
+
+## Deploy
+
+A Nova application is a plain `HttpHandler`, so the same code runs on a long-lived server and on serverless platforms.
+
+The recommended path for beginners is the **Subir** platform (`subir deploy`), which detects a Nova project and wires `nova/lambda` automatically with zero configuration. It is the shortest path, not the only one: any Lambda Function URL (payload format 2.0) or API Gateway HTTP API works with the adapter directly.
+
+```ts
+import { Application, Router } from "nova";
+import { NodeHttpAdapter } from "nova/node";
+import { toLambdaHandler } from "nova/lambda";
+
+const router = new Router();
+router.get("/", () => ({ statusCode: 200, body: "Olá, mundo!" }));
+
+// Local development: a real HTTP server.
+if (process.env.SUBIR !== "1") {
+  await new Application(new NodeHttpAdapter(), router.handle).listen(
+    Number(process.env.PORT ?? 3000),
+  );
+}
+
+// Serverless: the platform invokes this export once per request.
+export const handler = toLambdaHandler(router.handle);
+```
+
+`nova/lambda` also exposes `LambdaHttpAdapter`, an `HttpAdapter` that plugs into `Application` like the other runtimes, plus `fromLambdaEvent` and `toLambdaResult` for custom integrations.
 
 ## Roadmap
 
