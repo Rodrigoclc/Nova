@@ -8,6 +8,8 @@ Object-oriented HTTP framework for TypeScript, with controllers, decorators, DTO
 
 Nova aims to provide a familiar, strongly typed, object-oriented developer experience for engineers coming from ecosystems such as .NET and Java, while keeping the framework core independent from the underlying JavaScript runtime.
 
+For developers building their first back end, Nova is a way to be **organized from day one**: controllers and DTOs are how you structure an API, not a prerequisite you need to know beforehand. Tutorials in Portuguese start from zero and end with the API running on a public URL.
+
 The target API is intentionally controller-first:
 
 ```ts
