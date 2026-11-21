@@ -41,6 +41,7 @@ Expected capabilities:
 
 - Node.js adapter built on `node:http`
 - Bun adapter built on `Bun.serve()`
+- AWS Lambda adapter (`nova/lambda`) translating Function URL / HTTP API payload v2 events
 - Request and response translation between runtime APIs and Nova contracts
 - Runtime compatibility tests
 

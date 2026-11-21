@@ -18,27 +18,35 @@
     "./bun": {
       "types": "./dist/adapters/bun/index.d.ts",
       "import": "./dist/adapters/bun/index.js"
+    },
+    "./lambda": {
+      "types": "./dist/adapters/lambda/index.d.ts",
+      "import": "./dist/adapters/lambda/index.js"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "npm run build:core && npm run build:node && npm run build:bun",
+    "prepare": "npm run build",
+    "build": "npm run build:core && npm run build:node && npm run build:bun && npm run build:lambda",
     "build:core": "tsc -p tsconfig.json",
     "build:node": "tsc -p tsconfig.node.json",
     "build:bun": "tsc -p tsconfig.bun.json",
-    "typecheck": "npm run typecheck:core && npm run typecheck:types && npm run typecheck:node && npm run typecheck:bun",
+    "typecheck": "npm run typecheck:core && npm run typecheck:types && npm run typecheck:node && npm run typecheck:bun && npm run typecheck:lambda",
     "typecheck:core": "tsc -p tsconfig.json --noEmit",
     "typecheck:types": "tsc -p tsconfig.types.json",
     "typecheck:node": "tsc -p tsconfig.node.json --noEmit",
     "typecheck:bun": "tsc -p tsconfig.bun.json --noEmit",
-    "test": "npm run build && npm run test:request && npm run test:routing && npm run test:node",
+    "test": "npm run build && npm run test:request && npm run test:routing && npm run test:node && npm run test:lambda",
     "test:request": "node --test tests/request/*.test.mjs",
     "test:routing": "node --test tests/routing/*.test.mjs",
     "test:node": "node --test tests/node/*.test.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "build:lambda": "tsc -p tsconfig.lambda.json",
+    "typecheck:lambda": "tsc -p tsconfig.lambda.json --noEmit",
+    "test:lambda": "node --test tests/lambda/*.test.mjs"
   },
   "engines": {
     "node": ">=22"
